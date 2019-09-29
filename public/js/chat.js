@@ -43,6 +43,7 @@ const autoscroll = () => {
 socket.on("locationMessage", url => {
   console.log(url);
   const html = Mustache.render(locationTemplate, {
+    username: url.username,
     url: url.text,
     createdAt: moment(url.createdAt).format("h:mm A")
   });
