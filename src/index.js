@@ -33,29 +33,44 @@ io.on("connection", socket => {
 
     socket.join(user.room);
 
-    socket.emit("message", gm("Welcome"));
+    socket.emit("message", gm("Admin", "Welcome"));
     socket.broadcast
       .to(user.room)
-      .emit("message", gm(`${user.username} has joined the room`));
+      .emit("message", gm("Admin", `${user.username} has joined the room`));
+
+    io.to(user.room).emit("roomData", {
+      room: user.room,
+      users: getUsersInRoom(user.room)
+    });
     callback();
   });
 
   socket.on("sendMessage", (message, callback) => {
-    io.emit("message", gm(message));
+    const user = getUser(socket.id);
+    // console.log(user);
+    io.to(user.room).emit("message", gm(user.username, message));
     callback();
   });
 
   socket.on("disconnect", () => {
     const user = removeUser(socket.id);
     if (user) {
-      io.to(user.room).emit("message", gm(`${user} has left!`));
+      io.to(user.room).emit("message", gm("Admin", `${user} has left!`));
+      io.to(user.room).emit("roomData", {
+        room: user.room,
+        users: getUsersInRoom(user.room)
+      });
     }
   });
 
   socket.on("sendLocation", (pos, callback) => {
-    io.emit(
+    const user = getUser(socket.id);
+    io.to(user.room).emit(
       "locationMessage",
-      gm(`https://google.com/maps?q=${pos.latitude},${pos.longitude}`)
+      gm(
+        user.username,
+        `https://google.com/maps?q=${pos.latitude},${pos.longitude}`
+      )
     );
     callback();
   });

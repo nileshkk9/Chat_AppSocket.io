@@ -38,10 +38,9 @@ const removeUser = id => {
   }
 };
 
-//get user
+//get user;
 const getUser = id => {
-  const index = users.findIndex(user => user.id === id);
-  return users[index];
+  return users.find(user => user.id === id);
 };
 
 const getUsersInRoom = room => {
